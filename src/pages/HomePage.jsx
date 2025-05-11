@@ -1,3 +1,4 @@
+import { Link, useNavigate } from 'react-router-dom';
 import {
   MessageSquare,
   Shield,
@@ -12,6 +13,8 @@ import {
 } from "lucide-react";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50">
       {/* Navigation */}
@@ -51,10 +54,10 @@ const HomePage = () => {
               </a>
             </div>
             <div className="flex space-x-3">
-              <button className="text-purple-600 border border-purple-600 px-4 py-2 rounded-full hover:bg-purple-50 transition">
+              <button onClick={() => navigate('/login')} className="text-purple-600 border border-purple-600 px-4 py-2 rounded-full hover:bg-purple-50 transition">
                 Log In
               </button>
-              <button className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">
+              <button onClick={() => navigate('/signup')} className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">
                 Sign Up
               </button>
             </div>
