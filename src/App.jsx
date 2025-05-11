@@ -7,6 +7,7 @@ import Signup from './components/Auth/Signup';
 import Dashboard from './components/Dashboard/Dashboard';
 import SubmitGrievance from './components/Grievance/SubmitGrievance';
 import GrievanceDetails from './components/Grievance/GrievanceDetails';
+import ChatBot from './pages/Chatbot';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -33,6 +34,7 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/chat" element={<ChatBot />} />
         <Route
           path="/dashboard"
           element={
