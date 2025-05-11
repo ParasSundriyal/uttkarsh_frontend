@@ -8,7 +8,7 @@ const SubmitGrievance = () => {
     title: '',
     description: '',
     category: '',
-    priority: 'medium',
+    priority: 'Medium',
   });
   const [photo, setPhoto] = useState(null);
   const [error, setError] = useState('');
@@ -46,11 +46,12 @@ const SubmitGrievance = () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('category', formData.category);
       formDataToSend.append('priority', formData.priority);
+      console.log("Photo:", photo);
       if (photo) {
         formDataToSend.append('photo', photo);
       }
 
-      const response = await fetch('http://localhost:8080/api/grievances', {
+      const response = await fetch('http://localhost:8080/api/grievances/create', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

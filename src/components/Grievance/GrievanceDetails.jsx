@@ -1,14 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Clock, FileText, CheckCircle, XCircle, Download, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Clock,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Download,
+  MessageSquare,
+} from "lucide-react";
 
 const GrievanceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [grievance, setGrievance] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [comment, setComment] = useState('');
+  const [error, setError] = useState("");
+  const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
@@ -17,27 +24,30 @@ const GrievanceDetails = () => {
 
   const fetchGrievanceDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/api/grievances/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/grievances/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
         setGrievance(data.data);
         setComments(data.data.comments || []);
       } else {
-        setError('Failed to fetch grievance details');
+        setError("Failed to fetch grievance details");
       }
     } catch (err) {
-      setError('An error occurred while fetching grievance details');
+      setError("An error occurred while fetching grievance details");
     } finally {
       setLoading(false);
     }
@@ -48,52 +58,55 @@ const GrievanceDetails = () => {
     if (!comment.trim()) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/grievances/${id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: comment }),
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:8080/api/grievances/${id}/comments`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: comment }),
+        }
+      );
 
       if (response.ok) {
         const newComment = await response.json();
         setComments([...comments, newComment]);
-        setComment('');
+        setComment("");
       } else {
-        setError('Failed to add comment');
+        setError("Failed to add comment");
       }
     } catch (err) {
-      setError('An error occurred while adding the comment');
+      setError("An error occurred while adding the comment");
     }
   };
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'resolved':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "resolved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
-      case 'pending':
+      case "pending":
         return <Clock className="h-5 w-5" />;
-      case 'in_progress':
+      case "in_progress":
         return <FileText className="h-5 w-5" />;
-      case 'resolved':
+      case "resolved":
         return <CheckCircle className="h-5 w-5" />;
-      case 'rejected':
+      case "rejected":
         return <XCircle className="h-5 w-5" />;
       default:
         return <FileText className="h-5 w-5" />;
@@ -111,7 +124,10 @@ const GrievanceDetails = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
+        <div
+          className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative"
+          role="alert"
+        >
           <span className="block sm:inline">{error}</span>
         </div>
       </div>
@@ -137,7 +153,8 @@ const GrievanceDetails = () => {
                   {grievance.title}
                 </h3>
                 <p className="mt-1 text-sm text-zinc-500">
-                  Submitted on {new Date(grievance.createdAt).toLocaleDateString()}
+                  Submitted on{" "}
+                  {new Date(grievance.createdAt).toLocaleDateString()}
                 </p>
               </div>
               <span
@@ -146,45 +163,61 @@ const GrievanceDetails = () => {
                 )}`}
               >
                 {getStatusIcon(grievance.status)}
-                <span className="ml-1">{grievance.status.replace('_', ' ')}</span>
+                <span className="ml-1">
+                  {grievance.status.replace("_", " ")}
+                </span>
               </span>
             </div>
 
             <div className="mt-6 border-t border-zinc-200 pt-6">
               <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                 <div>
-                  <dt className="text-sm font-medium text-zinc-500">Category</dt>
-                  <dd className="mt-1 text-sm text-zinc-900">{grievance.category}</dd>
+                  <dt className="text-sm font-medium text-zinc-500">
+                    Category
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {grievance.category}
+                  </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-zinc-500">Priority</dt>
-                  <dd className="mt-1 text-sm text-zinc-900">{grievance.priority}</dd>
+                  <dt className="text-sm font-medium text-zinc-500">
+                    Priority
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {grievance.priority}
+                  </dd>
                 </div>
               </dl>
             </div>
 
             <div className="mt-6">
               <h4 className="text-sm font-medium text-zinc-900">Description</h4>
-              <p className="mt-2 text-sm text-zinc-500">{grievance.description}</p>
+              <p className="mt-2 text-sm text-zinc-500">
+                {grievance.description}
+              </p>
             </div>
 
             {grievance.attachments && grievance.attachments.length > 0 && (
               <div className="mt-6">
-                <h4 className="text-sm font-medium text-zinc-900">Attachments</h4>
+                <h4 className="text-sm font-medium text-zinc-900">
+                  Attachments
+                </h4>
                 <ul className="mt-2 divide-y divide-zinc-200">
                   {grievance.attachments.map((file, index) => (
-                    <li key={index} className="py-3 flex items-center justify-between">
+                    <li
+                      key={index}
+                      className="py-3 flex items-center justify-between"
+                    >
                       <div className="flex items-center">
-                        {file.filename && (file.filename.endsWith('.jpg') || file.filename.endsWith('.jpeg') || file.filename.endsWith('.png') || file.filename.endsWith('.gif')) ? (
-                          <img
-                            src={`http://localhost:8080/api/grievances/attachments/${file.filename}`}
-                            alt="attachment"
-                            className="h-32 w-auto rounded shadow border border-zinc-200 mr-4"
-                          />
-                        ) : (
-                          <FileText className="h-5 w-5 text-zinc-400" />
-                        )}
-                        <span className="ml-2 text-sm text-zinc-500">{file.filename || file.name}</span>
+                        <img
+                          src={file.url}
+                          alt="attachment"
+                          className="h-32 w-auto rounded shadow border border-zinc-200 mr-4"
+                        />
+
+                        <span className="ml-2 text-sm text-zinc-500">
+                          {file.filename || file.name}
+                        </span>
                       </div>
                     </li>
                   ))}
@@ -198,4 +231,4 @@ const GrievanceDetails = () => {
   );
 };
 
-export default GrievanceDetails; 
+export default GrievanceDetails;
