@@ -19,6 +19,8 @@ import Users from "./pages/admin/Users";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Stats from "./pages/admin/Stats";
 import Layout from "./components/Layout/Layout";
+import DepartmentLogin from "./pages/department/Login";
+import DepartmentDashboard from "./pages/department/Dashboard";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -105,6 +107,8 @@ const App = () => {
             }
           />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
+          <Route path="/department/login" element={<DepartmentLogin />} />
+          <Route path="/department/dashboard" element={<DepartmentDashboard />} />
         </Routes>
       </Layout>
     </Router>

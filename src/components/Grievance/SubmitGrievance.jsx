@@ -51,7 +51,7 @@ const SubmitGrievance = () => {
         formDataToSend.append('photo', photo);
       }
 
-      const response = await fetch('http://localhost:8080/api/grievances/create', {
+      const response = await fetch('http://localhost:8080/api/grievances', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

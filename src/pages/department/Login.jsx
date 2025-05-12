@@ -1,20 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const LockIcon = () => (
-  <svg className="mx-auto h-12 w-12 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-    <rect width="20" height="14" x="2" y="8" rx="2"/>
-    <path d="M7 8V6a5 5 0 0110 0v2" />
-  </svg>
-);
-
-const Login = () => {
+const DepartmentLogin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    studentId: "",
-    password: "",
+    departmentId: '',
+    password: '',
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -25,32 +18,23 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
+    setError('');
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch('http://localhost:8080/api/department/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
-
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        if (data.user.role === 'admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        localStorage.setItem('departmentToken', data.token);
+        localStorage.setItem('department', JSON.stringify(data.department));
+        navigate('/department/dashboard');
       } else {
-        setError(data.message || "Login failed");
+        setError(data.message || 'Login failed');
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError('An error occurred. Please try again.');
     }
   };
 
@@ -58,9 +42,12 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-400 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl">
         <div>
-          <LockIcon />
+          <svg className="mx-auto h-12 w-12 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+            <rect width="20" height="14" x="2" y="8" rx="2"/>
+            <path d="M7 8V6a5 5 0 0110 0v2" />
+          </svg>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Department Login
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -71,17 +58,17 @@ const Login = () => {
           )}
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="studentId" className="sr-only">
-                Student ID
+              <label htmlFor="departmentId" className="sr-only">
+                Department ID
               </label>
               <input
-                id="studentId"
-                name="studentId"
+                id="departmentId"
+                name="departmentId"
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-zinc-300 placeholder-zinc-400 text-zinc-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm transition"
-                placeholder="Student ID"
-                value={formData.studentId}
+                placeholder="Department ID"
+                value={formData.departmentId}
                 onChange={handleChange}
               />
             </div>
@@ -101,7 +88,6 @@ const Login = () => {
               />
             </div>
           </div>
-
           <div>
             <button
               type="submit"
@@ -111,18 +97,9 @@ const Login = () => {
             </button>
           </div>
         </form>
-        <div className="text-center mt-4">
-          <span className="text-zinc-500">Don't have an account? </span>
-          <Link to="/signup" className="text-purple-600 hover:underline font-medium">Sign up</Link>
-        </div>
-        <div className="text-center mt-2">
-          <Link to="/department/login" className="text-indigo-600 hover:underline font-medium">
-            Department Login
-          </Link>
-        </div>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default DepartmentLogin; 

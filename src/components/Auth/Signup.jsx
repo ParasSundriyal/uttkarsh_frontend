@@ -9,6 +9,9 @@ const UserPlusIcon = () => (
   </svg>
 );
 
+const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -19,8 +22,10 @@ const Signup = () => {
     studentId: '',
     course: '',
     role: 'student',
+    profilePic: '',
   });
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,6 +33,36 @@ const Signup = () => {
       [e.target.name]: e.target.value,
     });
   };
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    setUploading(true);
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', uploadPreset);  // This must be defined elsewhere
+    data.append('cloud_name', cloudName);        // Optional: Cloudinary ignores this if in URL
+  
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: data,
+      });
+  
+      const result = await res.json();
+      if (res.ok) {
+        console.log('Upload successful:', result);
+        setImageUrl(result.secure_url); // Or however you store image URLs
+      } else {
+        console.error('Upload failed:', result);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,6 +86,7 @@ const Signup = () => {
           studentId: formData.studentId,
           course: formData.course,
           role: formData.role,
+          profilePic: formData.profilePic,
         }),
       });
 
@@ -84,6 +120,23 @@ const Signup = () => {
             </div>
           )}
           <div className="rounded-md shadow-sm space-y-4">
+            <div className="flex flex-col items-center space-y-2">
+              {formData.profilePic ? (
+                <img src={formData.profilePic} alt="Profile Preview" className="h-20 w-20 rounded-full object-cover border-2 border-purple-300" />
+              ) : (
+                <div className="h-20 w-20 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 border-2 border-dashed border-purple-200">
+                  <UserPlusIcon />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="mt-2 text-sm"
+                disabled={uploading}
+              />
+              {uploading && <span className="text-xs text-zinc-400">Uploading...</span>}
+            </div>
             <div>
               <label htmlFor="name" className="sr-only">
                 Full Name
@@ -195,8 +248,9 @@ const Signup = () => {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition"
+              disabled={uploading}
             >
-              Sign up
+              {uploading ? 'Uploading...' : 'Sign up'}
             </button>
           </div>
         </form>
