@@ -1,144 +1,176 @@
 import { useState } from "react";
-import axios from "axios";
 
 function ChatBot() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      sender: "bot",
+      text: "Hello! How can I help with your student grievance today?",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const userId = "student123"; // Example static ID (use user login ID in real app)
 
-  const sendMessage = async (inputText) => {
-  if (!inputText.trim()) return;
+  const sendMessage = async (inputText, isImage = false) => {
+    if (!inputText && !isImage) return;
 
-  // Add user's message
-  setMessages((prev) => [...prev, { sender: "user", text: inputText }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "user",
+        ...(isImage ? { image: inputText } : { text: inputText }),
+      },
+    ]);
+    setInput("");
 
-  // Clear input field
-  setInput("");  // ✅ This clears the typing bubble
+    // Show "Typing..." indicator
+    setIsTyping(true);
 
-  // Show typing indicator
-  setMessages((prev) => [...prev, { sender: "bot", text: "Typing...", isTyping: true }]);
+    const payload = {
+      message: isImage ? inputText : inputText.trim(),
+      user_id: userId,
+    };
 
-  const res = await fetch("http://localhost:5000/api/message", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message: inputText }),
-  });
+    try {
+      const res = await fetch("http://localhost:5000/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: inputText,
+          user_id: userId,
+          token: localStorage.getItem("token"),
+        }),
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-  setTimeout(() => {
-    setMessages((prev) => {
-      const withoutTyping = prev.filter((msg) => !msg.isTyping);
-      return [...withoutTyping, { sender: "bot", text: data.reply }];
-    });
-    setIsTyping(false);
-  }, 1000);
-};
+      // Simulate delay
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.isTyping),
+          { sender: "bot", text: data.reply },
+        ]);
+        setIsTyping(false);
+      }, 800);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev.filter((msg) => !msg.isTyping),
+        { sender: "bot", text: "Error connecting to the server." },
+      ]);
+      setIsTyping(false);
+    }
+  };
 
   const handleVoiceInput = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Your browser doesn't support speech recognition.");
-      return;
-    }
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition)
+      return alert("Speech recognition not supported in this browser.");
 
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-
     recognition.start();
 
     recognition.onresult = (event) => {
       const voiceText = event.results[0][0].transcript;
-      console.log("Voice Input:", voiceText);
-
-      // Send this message just like a typed message
       sendMessage(voiceText);
     };
 
     recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      alert("Error with speech recognition: " + event.error);
+      alert("Speech recognition error: " + event.error);
     };
   };
-  
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setMessages((prev) => [
-          ...prev,
-          { sender: "user", image: reader.result },
-        ]);
+        // Send base64 image as a message
+        sendMessage(reader.result, true);
       };
       reader.readAsDataURL(file);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-900">🎓 Student Grievance Chatbot</h1>
-      <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-xl border border-gray-300">
-        <div className="h-80 overflow-y-auto space-y-4 mb-4">
-          {messages.map((msg, i) => (
+    <div className="flex flex-col h-full">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`flex ${
+              msg.sender === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div
-              key={i}
-              className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+              className={`p-2 rounded-xl max-w-[85%] text-sm break-words ${
+                msg.sender === "user"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-800"
+              }`}
             >
-              {msg.text && (
-                <div
-                  className={`p-4 rounded-xl max-w-[80%] ${
-                    msg.sender === "user" ? "bg-blue-400 text-white" : "bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              )}
+              {msg.text && <p>{msg.text}</p>}
               {msg.image && (
-                <div className="max-w-[80%] p-2">
-                  <img src={msg.image} alt="Uploaded" className="rounded-xl max-w-full" />
-                </div>
+                <img
+                  src={msg.image}
+                  alt="Uploaded"
+                  className="rounded-lg mt-1 max-w-xs"
+                />
               )}
             </div>
-          ))}
-          {isTyping && (
-            <div className="flex justify-start animate-pulse">
-              <div className="p-4 rounded-xl max-w-[80%] bg-gray-300 text-gray-800">...</div>
+          </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start animate-pulse">
+            <div className="p-2 rounded-xl bg-gray-300 text-sm text-gray-800">
+              ...
             </div>
-          )}
-        </div>
-        <div className="flex space-x-2">
+          </div>
+        )}
+      </div>
+
+      {/* Input */}
+      <div className="border-t border-gray-200 px-2 py-2">
+        <div className="flex items-center gap-1">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
-            className="flex-grow p-3 border rounded-full text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Type your complaint..."
+            className="flex-grow p-2 border rounded-l-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="Type your message..."
           />
           <button
             onClick={() => sendMessage(input)}
-            className="bg-blue-500 text-white p-3 rounded-full"
+            className="bg-blue-500 text-white px-3 py-2 rounded-r-full hover:bg-blue-600 text-sm"
           >
             Send
           </button>
-          <button onClick={handleVoiceInput} className="bg-gray-300 text-gray-800 p-3 rounded-full">
+          <button
+            onClick={handleVoiceInput}
+            className="bg-gray-200 text-gray-700 p-2 rounded-full hover:bg-gray-300 text-sm"
+            title="Voice Input"
+          >
             🎤
           </button>
-          <label htmlFor="image-upload" className="bg-gray-300 text-gray-800 p-3 rounded-full cursor-pointer">
+          <label
+            htmlFor="chatbot-image-upload"
+            className="bg-gray-200 text-gray-700 p-2 rounded-full hover:bg-gray-300 cursor-pointer text-sm"
+            title="Upload Image"
+          >
             📷
           </label>
           <input
-            id="image-upload"
+            id="chatbot-image-upload"
             type="file"
             accept="image/*"
-            onChange={handleImageUpload}
             className="hidden"
+            onChange={handleImageUpload}
           />
         </div>
       </div>

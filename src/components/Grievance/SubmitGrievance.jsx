@@ -46,7 +46,7 @@ const SubmitGrievance = () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('category', formData.category);
       formDataToSend.append('priority', formData.priority);
-      console.log("Photo:", photo);
+      // console.log("Photo:", photo);
       if (photo) {
         formDataToSend.append('photo', photo);
       }

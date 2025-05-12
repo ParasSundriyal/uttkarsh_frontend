@@ -1,21 +1,18 @@
-import Navbar from './Navbar';
+import Footer from "./Footer";
+import Navbar from "./Navbar";
+import SlidingChat from "./SlidingChat";
 
 const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <Navbar />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto">
         {children}
-      </main>
-      <footer className="bg-white shadow-lg mt-8">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} Grievance Redressal System. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+        <SlidingChat />
+        </main>
+      <Footer />
+    </>
   );
 };
 
-export default Layout; 
+export default Layout;
