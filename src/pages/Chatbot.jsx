@@ -18,7 +18,7 @@ function ChatBot() {
   // Show typing indicator
   setMessages((prev) => [...prev, { sender: "bot", text: "Typing...", isTyping: true }]);
 
-  const res = await fetch("http://localhost:5000/chat", {
+  const res = await fetch("http://localhost:5000/api/message", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

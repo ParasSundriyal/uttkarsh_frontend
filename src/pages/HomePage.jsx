@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import Chatbot from '../pages/Chatbot';
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import Chatbot from "../pages/Chatbot";
 import {
   MessageSquare,
   Shield,
@@ -12,11 +12,44 @@ import {
   Lightbulb,
   Clock,
   Award,
+  MinimizeIcon,
+  X,
+  MaximizeIcon,
 } from "lucide-react";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [showChatbot, setShowChatbot] = useState(false);
+  const [minimized, setMinimized] = useState(false);
+  const chatbotRef = useRef(null);
+
+  // Handle clicking outside chatbot to close it
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        chatbotRef.current &&
+        !chatbotRef.current.contains(event.target) &&
+        !event.target.closest("button[data-chatbot-toggle]")
+      ) {
+        setShowChatbot(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
+    setMinimized(false); // Reset minimized state when toggling
+  };
+
+  const toggleMinimize = (e) => {
+    e.stopPropagation();
+    setMinimized(!minimized);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50">
@@ -57,10 +90,16 @@ const HomePage = () => {
               </a>
             </div>
             <div className="flex space-x-3">
-              <button onClick={() => navigate('/login')} className="text-purple-600 border border-purple-600 px-4 py-2 rounded-full hover:bg-purple-50 transition">
+              <button
+                onClick={() => navigate("/login")}
+                className="text-purple-600 border border-purple-600 px-4 py-2 rounded-full hover:bg-purple-50 transition"
+              >
                 Log In
               </button>
-              <button onClick={() => navigate('/signup')} className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">
+              <button
+                onClick={() => navigate("/signup")}
+                className="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition"
+              >
                 Sign Up
               </button>
             </div>
@@ -83,7 +122,8 @@ const HomePage = () => {
                 Your Concerns <span className="text-fuchsia-300">Matter</span>
               </h1>
               <p className="text-xl mb-8 text-purple-100 max-w-lg">
-                A modern platform for students to voice concerns and receive timely, transparent resolutions from educational institutions.
+                A modern platform for students to voice concerns and receive
+                timely, transparent resolutions from educational institutions.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <button className="bg-white text-purple-900 px-6 py-3 rounded-full font-medium hover:bg-purple-50 transition group">
@@ -158,17 +198,75 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        
-            {/* Floating Chatbot */}
-      {showChatbot && (
-        <div className="fixed bottom-4 right-4 w-[350px] h-[500px] z-50 shadow-lg rounded-lg bg-white border border-gray-300">
-          <Chatbot />
-        </div>
-      )}
-    </div>
-  
 
+        {/* Floating Chatbot */}
+        {showChatbot && (
+          <div
+            ref={chatbotRef}
+            className={`fixed z-50 transition-all duration-300 shadow-xl ${
+              minimized
+                ? "bottom-4 right-4 w-64 h-12 rounded-full"
+                : "bottom-4 right-4 w-80 md:w-96 h-[500px] rounded-2xl"
+            }`}
+          >
+            {/* Chatbot Header */}
+            <div
+              className={`bg-purple-600 flex items-center justify-between px-4 py-3 ${
+                minimized ? "rounded-full" : "rounded-t-2xl"
+              }`}
+            >
+              <div className="flex items-center">
+                <MessageSquare className="h-5 w-5 text-white mr-2" />
+                <span className="font-medium text-white">
+                  Student Assistant
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={toggleMinimize}
+                  className="text-white/80 hover:text-white transition-colors p-1 rounded focus:outline-none"
+                  aria-label={minimized ? "Maximize" : "Minimize"}
+                >
+                  {minimized ? (
+                    <MaximizeIcon className="h-4 w-4" />
+                  ) : (
+                    <MinimizeIcon className="h-4 w-4" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowChatbot(false)}
+                  className="text-white/80 hover:text-white transition-colors p-1 rounded focus:outline-none"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
 
+            {/* Chatbot Body */}
+            {!minimized && (
+              <div className="bg-white h-[calc(100%-56px)] rounded-b-2xl flex flex-col">
+                <div className="flex-1 p-4 overflow-auto">
+                  {/* Chat messages would go here */}
+                  <Chatbot />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Chatbot Trigger Button (visible when chatbot is closed) */}
+        {!showChatbot && (
+          <button
+            onClick={toggleChatbot}
+            className="fixed bottom-4 right-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center"
+            aria-label="Open chat"
+          >
+            <MessageSquare className="h-6 w-6" />
+          </button>
+        )}
+      </div>
+      
       {/* How It Works - Redesigned with timeline */}
       <div id="how-it-works" className="py-20 bg-zinc-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
