@@ -1,4 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import Chatbot from '../pages/Chatbot';
 import {
   MessageSquare,
   Shield,
@@ -14,6 +16,7 @@ import {
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [showChatbot, setShowChatbot] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50">
@@ -80,8 +83,7 @@ const HomePage = () => {
                 Your Concerns <span className="text-fuchsia-300">Matter</span>
               </h1>
               <p className="text-xl mb-8 text-purple-100 max-w-lg">
-                A modern platform for students to voice concerns and receive
-                timely, transparent resolutions from educational institutions.
+                A modern platform for students to voice concerns and receive timely, transparent resolutions from educational institutions.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <button className="bg-white text-purple-900 px-6 py-3 rounded-full font-medium hover:bg-purple-50 transition group">
@@ -91,37 +93,17 @@ const HomePage = () => {
                 <button className="bg-transparent border border-white text-white px-6 py-3 rounded-full font-medium hover:bg-white/10 transition">
                   Learn More
                 </button>
-              </div>
-            </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-xl w-full max-w-md border border-white/20">
-                <h2 className="text-white font-bold text-xl mb-4 flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-fuchsia-300" />
-                  Quick Actions
-                </h2>
-                <div className="space-y-4">
-                  <div className="flex items-center p-3 bg-white/5 rounded-xl text-white hover:bg-white/10 cursor-pointer transition group">
-                    <MessageSquare className="h-5 w-5 mr-3 text-fuchsia-300" />
-                    <span>Submit New Grievance</span>
-                    <ChevronRight className="h-5 w-5 ml-auto transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <div className="flex items-center p-3 bg-white/5 rounded-xl text-white hover:bg-white/10 cursor-pointer transition group">
-                    <BarChart className="h-5 w-5 mr-3 text-fuchsia-300" />
-                    <span>Track Grievance Status</span>
-                    <ChevronRight className="h-5 w-5 ml-auto transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <div className="flex items-center p-3 bg-white/5 rounded-xl text-white hover:bg-white/10 cursor-pointer transition group">
-                    <Users className="h-5 w-5 mr-3 text-fuchsia-300" />
-                    <span>Connect with Authorities</span>
-                    <ChevronRight className="h-5 w-5 ml-auto transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
+                <button
+                  className="bg-yellow-500 text-white px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition"
+                  onClick={() => setShowChatbot(!showChatbot)}
+                >
+                  {showChatbot ? "Close Chatbot" : "Chat with Assistant"}
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* Features Section - Redesigned with cards */}
       <div id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -176,7 +158,16 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
+        
+            {/* Floating Chatbot */}
+      {showChatbot && (
+        <div className="fixed bottom-4 right-4 w-[350px] h-[500px] z-50 shadow-lg rounded-lg bg-white border border-gray-300">
+          <Chatbot />
+        </div>
+      )}
+    </div>
+  
+
 
       {/* How It Works - Redesigned with timeline */}
       <div id="how-it-works" className="py-20 bg-zinc-50">

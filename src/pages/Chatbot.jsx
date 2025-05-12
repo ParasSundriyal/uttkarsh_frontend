@@ -65,6 +65,7 @@ function ChatBot() {
       alert("Error with speech recognition: " + event.error);
     };
   };
+  
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
