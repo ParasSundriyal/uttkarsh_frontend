@@ -8,6 +8,11 @@ import Dashboard from './components/Dashboard/Dashboard';
 import SubmitGrievance from './components/Grievance/SubmitGrievance';
 import GrievanceDetails from './components/Grievance/GrievanceDetails';
 import ChatBot from './pages/Chatbot';
+import AdminLogin from './pages/admin/Login';
+import Grievances from './pages/admin/Grievances';
+import Users from './pages/admin/Users';
+import AdminDashboard from './pages/admin/Dashboard';
+import Stats from './pages/admin/Stats';
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -59,6 +64,40 @@ const App = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <PrivateRoute>
+              <AdminDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/grievances"
+          element={
+            <PrivateRoute>
+              <Grievances />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <PrivateRoute>
+              <Users />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/stats"
+          element={
+            <PrivateRoute>
+              <Stats />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
       </Routes>
     </Router>
   )
