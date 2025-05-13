@@ -18,11 +18,11 @@ const HomePage = () => {
   const chatbotRef = useRef(null);
 
   const handleRegisterGrievance = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-      navigate('/submit-grievance');
+      navigate("/submit-grievance");
     } else {
-      navigate('/login', { state: { from: '/submit-grievance' } });
+      navigate("/login", { state: { from: "/submit-grievance" } });
     }
   };
 
@@ -450,13 +450,16 @@ const HomePage = () => {
             their issues through our platform
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <button className="bg-white text-purple-900 px-8 py-4 rounded-full font-medium hover:bg-purple-50 transition group">
+            <button
+              className="bg-white text-purple-900 px-8 py-4 rounded-full font-medium hover:bg-purple-50 transition group"
+              onClick={handleRegisterGrievance}
+            >
               Register Now
               <ChevronRight className="inline-block ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="bg-transparent border border-white text-white px-8 py-4 rounded-full font-medium hover:bg-white/10 transition">
+            {/* <button className="bg-transparent border border-white text-white px-8 py-4 rounded-full font-medium hover:bg-white/10 transition">
               Watch Demo
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

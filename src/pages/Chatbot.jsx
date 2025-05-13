@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Trash2, HelpCircle } from "lucide-react";
 
 function ChatBot() {
   const [messages, setMessages] = useState([
@@ -9,6 +10,7 @@ function ChatBot() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [showFAQs, setShowFAQs] = useState(false);
   const userId = "student123"; // Example static ID
 
   const token = localStorage.getItem("token");
@@ -222,12 +224,153 @@ function ChatBot() {
 
   return (
     <div className="flex flex-col h-full">
-      <button
-        onClick={handleClearChat}
-        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm mt-2"
-      >
-        Clear Chat
-      </button>
+      {/* Header with title and clear chat icon */}
+      <div className="flex justify-between items-center px-4 py-2 border-b border-gray-200">
+        <h2 className="text-lg font-medium text-gray-800">Student Support</h2>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setShowFAQs(!showFAQs)}
+            className="text-gray-500 hover:text-blue-500 p-1 rounded-full hover:bg-gray-100"
+            title="View common questions"
+          >
+            <HelpCircle size={18} />
+          </button>
+          <button
+            onClick={handleClearChat}
+            className="text-gray-500 hover:text-red-500 p-1 rounded-full hover:bg-gray-100"
+            title="Clear chat history"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* FAQ Panel */}
+      {showFAQs && (
+        <div className="bg-gray-50 p-3 border-b border-gray-200 max-h-64 overflow-y-auto">
+          <h3 className="font-medium text-gray-700 mb-2">
+            Frequently Asked Questions
+          </h3>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <button
+                onClick={() => {
+                  setInput("How long does it take to resolve a grievance?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                How long does it take to resolve a grievance?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("Who will handle my grievance?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                Who will handle my grievance?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("Can I update my grievance after submitting?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                Can I update my grievance after submitting?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("What types of grievances can I submit?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                What types of grievances can I submit?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("Can I submit an anonymous grievance?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                Can I submit an anonymous grievance?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("How can I check the status of my grievance?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                How can I check the status of my grievance?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput(
+                    "What happens if my grievance isn't resolved properly?"
+                  );
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                What happens if my grievance isn't resolved properly?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput(
+                    "Is there a limit on how many grievances I can submit?"
+                  );
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                Is there a limit on how many grievances I can submit?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput("What are the priority levels for grievances?");
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                What are the priority levels for grievances?
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => {
+                  setInput(
+                    "Will I receive notifications about my grievance status?"
+                  );
+                  setShowFAQs(false);
+                }}
+                className="text-blue-600 hover:underline text-left w-full"
+              >
+                Will I receive notifications about my grievance status?
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2">

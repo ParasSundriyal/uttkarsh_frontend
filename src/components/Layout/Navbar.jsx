@@ -46,10 +46,10 @@ const Navbar = () => {
               Dashboard
             </a>
 
-            <a href="/about" className="text-zinc-600 hover:text-purple-600">
+            <a href="/about-us" className="text-zinc-600 hover:text-purple-600">
               About
             </a>
-            <a href="/contact" className="text-zinc-600 hover:text-purple-600">
+            <a href="/contact-us" className="text-zinc-600 hover:text-purple-600">
               Contact
             </a>
           </div>
