@@ -35,6 +35,7 @@ const GrievanceDetails = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -189,12 +190,25 @@ const GrievanceDetails = () => {
                 </div>
               </dl>
             </div>
-
-            <div className="mt-6">
-              <h4 className="text-sm font-medium text-zinc-900">Description</h4>
-              <p className="mt-2 text-sm text-zinc-500">
-                {grievance.description}
-              </p>
+            <div className="mt-6 pt-6">
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">
+                    Description
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {grievance.description}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm font-medium text-zinc-500">
+                    Grievance ID
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {grievance.grievanceNumber}
+                  </dd>
+                </div>
+              </dl>
             </div>
 
             {grievance.attachments && grievance.attachments.length > 0 && (
@@ -210,14 +224,10 @@ const GrievanceDetails = () => {
                     >
                       <div className="flex items-center">
                         <img
-                          src={file.url}
+                          src={file}
                           alt="attachment"
                           className="h-32 w-auto rounded shadow border border-zinc-200 mr-4"
                         />
-
-                        <span className="ml-2 text-sm text-zinc-500">
-                          {file.filename || file.name}
-                        </span>
                       </div>
                     </li>
                   ))}

@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Upload, X } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Upload, X } from "lucide-react";
 
 const SubmitGrievance = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: '',
-    priority: 'Medium',
+    title: "",
+    description: "",
+    category: "",
+    priority: "Medium",
   });
   const [photo, setPhoto] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -29,45 +29,89 @@ const SubmitGrievance = () => {
     setPhoto(null);
   };
 
+  const formDataToObject = (formData) => {
+    const object = {};
+
+    formData.forEach((value, key) => {
+      object[key] = value;
+    });
+
+    return object;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
+      // Create FormData for other fields
       const formDataToSend = new FormData();
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('category', formData.category);
-      formDataToSend.append('priority', formData.priority);
-      // console.log("Photo:", photo);
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("category", formData.category);
+      formDataToSend.append("priority", formData.priority);
+
+      // If there's an image, upload it to Cloudinary
       if (photo) {
-        formDataToSend.append('photo', photo);
+        // Replace with your Cloudinary upload preset and cloud name
+        const uploadPreset = "uttkarsh";
+        const cloudName = "dwlezv6pr";
+
+        const formData = new FormData();
+        formData.append("file", photo);
+        formData.append("upload_preset", uploadPreset);
+        formData.append("cloud_name", cloudName);
+
+        // Upload image to Cloudinary
+        const cloudinaryResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const cloudinaryData = await cloudinaryResponse.json();
+
+        if (cloudinaryResponse.ok) {
+          // Get the image URL from Cloudinary's response
+          const imageUrl = cloudinaryData.secure_url;
+          console.log("image url: " + imageUrl);
+          formDataToSend.append("photo", imageUrl); // Add Cloudinary URL to form data
+        } else {
+          setError("Image upload failed");
+          return;
+        }
       }
 
-      const response = await fetch('http://localhost:8080/api/grievances', {
-        method: 'POST',
+      let obj = formDataToObject(formDataToSend);
+      console.log(obj);
+      // Send the form data to your backend
+      const response = await fetch("http://localhost:8080/api/grievances", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Ensure you specify JSON
         },
-        body: formDataToSend,
+        body: JSON.stringify(obj), // Convert object to JSON string
       });
 
       if (response.ok) {
-        alert('Grievance submitted successfully!');
-        navigate('/dashboard', { state: { refresh: true } });
+        alert("Grievance submitted successfully!");
+        navigate("/dashboard", { state: { refresh: true } });
       } else {
         const data = await response.json();
-        setError(data.message || 'Failed to submit grievance');
+        setError(data.message || "Failed to submit grievance");
       }
     } catch (err) {
-      setError('An error occurred while submitting the grievance');
+      setError("An error occurred while submitting the grievance");
     } finally {
       setLoading(false);
     }
@@ -86,14 +130,20 @@ const SubmitGrievance = () => {
             </div>
 
             {error && (
-              <div className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
+              <div
+                className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative"
+                role="alert"
+              >
                 <span className="block sm:inline">{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-6">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-zinc-700"
+                >
                   Title
                 </label>
                 <input
@@ -108,7 +158,10 @@ const SubmitGrievance = () => {
               </div>
 
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="category"
+                  className="block text-sm font-medium text-zinc-700"
+                >
                   Category
                 </label>
                 <select
@@ -121,14 +174,18 @@ const SubmitGrievance = () => {
                 >
                   <option value="">Select a category</option>
                   <option value="Academic">Academic</option>
-                  <option value="Administrative">Administrative</option>
+                  <option value="Administration">Administration</option>
                   <option value="Infrastructure">Infrastructure</option>
-                  <option value="Other">Other</option>
+                  <option value="Hostel">Hostel</option>
+                  <option value="General">General</option>
                 </select>
               </div>
 
               <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="priority"
+                  className="block text-sm font-medium text-zinc-700"
+                >
                   Priority
                 </label>
                 <select
@@ -146,7 +203,10 @@ const SubmitGrievance = () => {
               </div>
 
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-zinc-700">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-zinc-700"
+                >
                   Description
                 </label>
                 <textarea
@@ -184,16 +244,16 @@ const SubmitGrievance = () => {
                       </label>
                       <p className="pl-1">or drag and drop</p>
                     </div>
-                    <p className="text-xs text-zinc-500">
-                      JPG, PNG up to 10MB
-                    </p>
+                    <p className="text-xs text-zinc-500">JPG, PNG up to 10MB</p>
                   </div>
                 </div>
               </div>
 
               {photo && (
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium text-zinc-700">Selected Photo:</h4>
+                  <h4 className="text-sm font-medium text-zinc-700">
+                    Selected Photo:
+                  </h4>
                   <div className="flex items-center justify-between py-2">
                     <span className="text-sm text-zinc-500">{photo.name}</span>
                     <button
@@ -210,7 +270,7 @@ const SubmitGrievance = () => {
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate("/dashboard")}
                   className="bg-white py-2 px-4 border border-zinc-300 rounded-md shadow-sm text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                 >
                   Cancel
@@ -220,7 +280,7 @@ const SubmitGrievance = () => {
                   disabled={loading}
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                 >
-                  {loading ? 'Submitting...' : 'Submit Grievance'}
+                  {loading ? "Submitting..." : "Submit Grievance"}
                 </button>
               </div>
             </form>
@@ -231,4 +291,4 @@ const SubmitGrievance = () => {
   );
 };
 
-export default SubmitGrievance; 
+export default SubmitGrievance;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function ChatBot() {
   const [messages, setMessages] = useState([
@@ -9,55 +9,188 @@ function ChatBot() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const userId = "student123"; // Example static ID (use user login ID in real app)
+  const userId = "student123"; // Example static ID
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchChatLogs = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/chatlogs", {
+          method: "GET", // optional for GET, but included for clarity
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        // Transform log into chat messages
+        const formattedMessages = data.flatMap((log) => [
+          { sender: "user", text: log.message },
+          { sender: "bot", text: log.reply },
+        ]);
+
+        setMessages(
+          formattedMessages.length > 0
+            ? formattedMessages
+            : [
+                {
+                  sender: "bot",
+                  text: "Hello! How can I help with your student grievance today?",
+                },
+              ]
+        );
+      } catch (err) {
+        console.error("Error fetching chat logs:", err);
+        setMessages([
+          {
+            sender: "bot",
+            text: "Hello! How can I help with your student grievance today?",
+          },
+        ]);
+      }
+    };
+
+    fetchChatLogs();
+  }, []);
+
+  const handleClearChat = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/chatlogs/reset", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await res.json();
+      alert(result.message || "Chat history cleared.");
+
+      setMessages([
+        {
+          sender: "bot",
+          text: "Hello! How can I help with your student grievance today?",
+        },
+      ]);
+    } catch (err) {
+      console.error("Error clearing chat:", err);
+      alert("Failed to clear chat.");
+    }
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const uploadPreset = "uttkarsh";
+      const cloudName = "dwlezv6pr";
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+
+      // Upload image to Cloudinary
+      try {
+        const cloudinaryResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        const cloudinaryData = await cloudinaryResponse.json();
+
+        if (cloudinaryResponse.ok) {
+          // Get the image URL from Cloudinary's response
+          const imageUrl = cloudinaryData.secure_url;
+          console.log("Image URL: " + imageUrl);
+          sendMessage(imageUrl, true);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "bot",
+              text: "❌ Image upload failed. Please try again.",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Image upload error:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text: "❌ Error uploading image. Please try again.",
+          },
+        ]);
+      }
+    }
+  };
 
   const sendMessage = async (inputText, isImage = false) => {
-    if (!inputText && !isImage) return;
+    if (!inputText) return;
 
+    // Add user message
     setMessages((prev) => [
       ...prev,
       {
         sender: "user",
-        ...(isImage ? { image: inputText } : { text: inputText }),
+        text: isImage ? null : inputText,
+        image: isImage ? inputText : null,
       },
     ]);
     setInput("");
-
-    // Show "Typing..." indicator
     setIsTyping(true);
 
-    const payload = {
-      message: isImage ? inputText : inputText.trim(),
-      user_id: userId,
-    };
+    const token = localStorage.getItem("token");
+    let res;
 
     try {
-      const res = await fetch("http://localhost:5000/chat", {
+      res = await fetch("http://localhost:5000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: inputText,
+          message: inputText.trim(),
           user_id: userId,
-          token: localStorage.getItem("token"),
+          token,
         }),
       });
 
       const data = await res.json();
+      const botReply = data.reply;
+      console.log("Bot reply:", botReply);
 
-      // Simulate delay
+      // Wait briefly before showing bot response
       setTimeout(() => {
         setMessages((prev) => [
           ...prev.filter((msg) => !msg.isTyping),
-          { sender: "bot", text: data.reply },
+          { sender: "bot", text: botReply },
         ]);
         setIsTyping(false);
       }, 800);
+
+      // 🔁 Log user message and bot reply
+      await fetch("http://localhost:8080/api/chatlogs", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          message: inputText.trim(),
+          reply: botReply,
+        }),
+      });
     } catch (error) {
       setMessages((prev) => [
         ...prev.filter((msg) => !msg.isTyping),
-        { sender: "bot", text: "Error connecting to the server." },
+        { sender: "bot", text: "❌ Error connecting to the server." },
       ]);
       setIsTyping(false);
     }
@@ -66,8 +199,10 @@ function ChatBot() {
   const handleVoiceInput = () => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition)
-      return alert("Speech recognition not supported in this browser.");
+    if (!SpeechRecognition) {
+      alert("Speech recognition not supported in this browser.");
+      return;
+    }
 
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
@@ -85,20 +220,15 @@ function ChatBot() {
     };
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Send base64 image as a message
-        sendMessage(reader.result, true);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <div className="flex flex-col h-full">
+      <button
+        onClick={handleClearChat}
+        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm mt-2"
+      >
+        Clear Chat
+      </button>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2">
         {messages.map((msg, i) => (
