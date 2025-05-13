@@ -39,7 +39,7 @@ const DashboardLayout = ({ children }) => {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed z-50 md:static top-0 left-0 h-full flex flex-col transition-all duration-300 bg-white shadow-lg
+        className={`fixed z-50 top-0 left-0 h-full flex flex-col transition-all duration-300 bg-white shadow-lg
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:block
           ${sidebarState === SIDEBAR_COLLAPSED ? 'w-14' : 'w-56'}
