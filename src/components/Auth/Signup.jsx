@@ -23,6 +23,7 @@ const Signup = () => {
     course: '',
     role: 'student',
     profilePic: '',
+    phoneNumber: '',
   });
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -51,8 +52,10 @@ const Signup = () => {
   
       const result = await res.json();
       if (res.ok) {
-        console.log('Upload successful:', result);
-        setImageUrl(result.secure_url); // Or however you store image URLs
+        setFormData((prev) => ({
+          ...prev,
+          profilePic: result.secure_url,
+        }));
       } else {
         console.error('Upload failed:', result);
       }
@@ -87,6 +90,7 @@ const Signup = () => {
           course: formData.course,
           role: formData.role,
           profilePic: formData.profilePic,
+          phoneNumber: formData.phoneNumber,
         }),
       });
 
@@ -105,8 +109,13 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-400 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: 'url("https://uktech.ac.in/images/UTU-Dehradun-building.jpg")', filter: 'brightness(0.85)' }} />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* Content */}
+      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl relative z-20">
         <div>
           <UserPlusIcon />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -194,6 +203,22 @@ const Signup = () => {
                 className="appearance-none relative block w-full px-4 py-3 border border-zinc-300 placeholder-zinc-400 text-zinc-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm transition"
                 placeholder="Course"
                 value={formData.course}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="phoneNumber" className="sr-only">
+                Phone Number
+              </label>
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                required
+                pattern="[0-9]{10}"
+                className="appearance-none relative block w-full px-4 py-3 border border-zinc-300 placeholder-zinc-400 text-zinc-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm transition"
+                placeholder="Phone Number (10 digits)"
+                value={formData.phoneNumber}
                 onChange={handleChange}
               />
             </div>

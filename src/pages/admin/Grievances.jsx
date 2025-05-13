@@ -16,10 +16,12 @@ const Grievances = () => {
   const [selectedGrievance, setSelectedGrievance] = useState(null);
   const [comment, setComment] = useState('');
   const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     fetchGrievances();
     fetchUsers();
+    fetchDepartments();
   }, [filters]);
 
   const fetchGrievances = async () => {
@@ -41,6 +43,15 @@ const Grievances = () => {
       setUsers(response.data.data);
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get('/department/departments');
+      setDepartments(response.data.data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
     }
   };
 
@@ -72,6 +83,17 @@ const Grievances = () => {
       fetchGrievances();
     } catch (error) {
       console.error('Error assigning grievance:', error);
+    }
+  };
+
+  const handleAssignDepartment = async (grievanceId, departmentId) => {
+    try {
+      await axios.put(`/grievances/${grievanceId}`, {
+        department: departmentId
+      });
+      fetchGrievances();
+    } catch (error) {
+      console.error('Error assigning department:', error);
     }
   };
 
@@ -177,11 +199,11 @@ const Grievances = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0 w-full">
                     <select
                       value={grievance.status}
                       onChange={(e) => handleStatusUpdate(grievance._id, e.target.value)}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="w-full md:w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     >
                       <option value="Pending">Pending</option>
                       <option value="In Progress">In Progress</option>
@@ -189,15 +211,16 @@ const Grievances = () => {
                       <option value="Rejected">Rejected</option>
                     </select>
 
+                    {/* Department assignment dropdown */}
                     <select
-                      value={grievance.assignedTo?._id || ''}
-                      onChange={(e) => handleAssign(grievance._id, e.target.value)}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      value={grievance.department?._id || ''}
+                      onChange={e => handleAssignDepartment(grievance._id, e.target.value)}
+                      className="w-full md:w-auto rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     >
-                      <option value="">Assign to...</option>
-                      {users.map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user.name}
+                      <option value="">Assign to department...</option>
+                      {departments.map(dept => (
+                        <option key={dept._id} value={dept._id}>
+                          {dept.name}
                         </option>
                       ))}
                     </select>

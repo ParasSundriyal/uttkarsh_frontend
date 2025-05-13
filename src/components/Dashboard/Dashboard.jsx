@@ -94,111 +94,112 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-400 py-10 px-2 sm:px-0">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Profile Card */}
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-white rounded-2xl shadow-lg p-6 mb-2 gap-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-purple-200 to-indigo-200 rounded-full p-1">
-              {user?.profilePic ? (
-                <img src={user.profilePic} alt="Profile" className="h-16 w-16 rounded-full object-cover border-2 border-purple-300" />
-              ) : (
-                <User className="h-10 w-10 text-purple-600" />
-              )}
+    <div className="min-h-screen relative">
+      {/* Background Image with Overlay */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url("https://uktech.ac.in/images/UTU-Dehradun-building.jpg")',
+          filter: 'brightness(0.85)',
+        }}
+      />
+      
+      {/* Content with Semi-transparent Overlay */}
+      <div className="relative min-h-screen bg-black/40 py-10 px-2 sm:px-0">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Profile Card */}
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-2 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-to-br from-purple-200 to-indigo-200 rounded-full p-1">
+                {user?.profilePic ? (
+                  <img src={user.profilePic} alt="Profile" className="h-16 w-16 rounded-full object-cover border-2 border-purple-300" />
+                ) : (
+                  <User className="h-10 w-10 text-purple-600" />
+                )}
+              </div>
+              <div>
+                <div className="text-lg font-bold text-zinc-800">{user?.name || 'User'}</div>
+                <div className="text-sm text-zinc-500">{user?.email}</div>
+              </div>
             </div>
-            <div>
-              <div className="text-lg font-bold text-zinc-800">{user?.name || 'User'}</div>
-              <div className="text-sm text-zinc-500">{user?.email}</div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold shadow hover:from-purple-600 hover:to-indigo-600 transition"
+            >
+              <LogOut className="h-4 w-4" /> Log Out
+            </button>
+          </div>
+
+          {/* Summary Bar */}
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow">
+              <Clock className="h-5 w-5 text-yellow-500" />
+              <span className="font-semibold text-zinc-700">Pending:</span>
+              <span className="text-yellow-700 font-bold">{summary.pending}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow">
+              <FileText className="h-5 w-5 text-blue-500" />
+              <span className="font-semibold text-zinc-700">In Progress:</span>
+              <span className="text-blue-700 font-bold">{summary['in progress']}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="font-semibold text-zinc-700">Resolved:</span>
+              <span className="text-green-700 font-bold">{summary.resolved}</span>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold shadow hover:from-purple-600 hover:to-indigo-600 transition"
-          >
-            <LogOut className="h-4 w-4" /> Log Out
-          </button>
-        </div>
 
-        {/* Summary Bar */}
-        <div className="flex flex-wrap justify-center gap-4 mb-4">
-          <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow">
-            <Clock className="h-5 w-5 text-yellow-500" />
-            <span className="font-semibold text-zinc-700">Pending:</span>
-            <span className="text-yellow-700 font-bold">{summary.pending}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow">
-            <FileText className="h-5 w-5 text-blue-500" />
-            <span className="font-semibold text-zinc-700">In Progress:</span>
-            <span className="text-blue-700 font-bold">{summary['in progress']}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-2 shadow">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span className="font-semibold text-zinc-700">Resolved:</span>
-            <span className="text-green-700 font-bold">{summary.resolved}</span>
-          </div>
-        </div>
-
-        {/* New Grievance Button */}
-        <div className="flex justify-center mb-4">
-          <button
-            onClick={() => navigate('/submit-grievance')}
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-lg transition"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            New Grievance
-          </button>
-        </div>
-
-        {successMessage && (
-          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded relative mb-4 text-center shadow">
-            <span className="block sm:inline">{successMessage}</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative mb-4 text-center shadow">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-
-        {/* Grievance Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Array.isArray(grievances) && grievances.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center py-16 text-zinc-400">
-              <svg className="h-20 w-20 mb-4 text-purple-200" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-              <span className="text-lg">No grievances found.<br />Submit your first grievance!</span>
+          {successMessage && (
+            <div className="bg-green-50/90 backdrop-blur-sm border border-green-200 text-green-600 px-4 py-3 rounded relative mb-4 text-center shadow">
+              <span className="block sm:inline">{successMessage}</span>
             </div>
-          ) : (
-            Array.isArray(grievances) && grievances.map((grievance) => {
-              const status = grievance.status?.toLowerCase();
-              return (
-                <div key={grievance._id} className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-between min-h-[180px] transition hover:shadow-xl">
-                  {/* Status Ribbon */}
-                  <div className={`absolute top-0 right-0 px-4 py-1 rounded-bl-2xl text-xs font-bold text-white ${statusRibbonColors[status] || 'bg-gray-400'}`}>{grievance.status?.replace('_', ' ')}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {statusIcons[status] || <FileText className="h-4 w-4" />}
-                      <span className="font-semibold text-purple-700 text-base truncate">{grievance.title}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"><Layers className="h-3 w-3 mr-1" />{grievance.category}</span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><Star className="h-3 w-3 mr-1" />{grievance.priority}</span>
-                    </div>
-                    <p className="text-sm text-zinc-500 mb-2 truncate">{grievance.description}</p>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-zinc-400">Submitted on {new Date(grievance.createdAt).toLocaleDateString()}</span>
-                    <button
-                      onClick={() => navigate(`/grievance/${grievance._id}`)}
-                      className="text-xs font-medium text-purple-600 hover:text-purple-500 transition"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              );
-            })
           )}
+
+          {error && (
+            <div className="bg-red-50/90 backdrop-blur-sm border border-red-200 text-red-600 px-4 py-3 rounded relative mb-4 text-center shadow">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
+
+          {/* Grievance Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Array.isArray(grievances) && grievances.length === 0 ? (
+              <div className="col-span-full flex flex-col items-center py-16 text-zinc-400">
+                <svg className="h-20 w-20 mb-4 text-purple-200" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                <span className="text-lg">No grievances found.<br />Submit your first grievance!</span>
+              </div>
+            ) : (
+              Array.isArray(grievances) && grievances.map((grievance) => {
+                const status = grievance.status?.toLowerCase();
+                return (
+                  <div key={grievance._id} className="relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-6 flex flex-col justify-between min-h-[180px] transition hover:shadow-xl">
+                    {/* Status Ribbon */}
+                    <div className={`absolute top-0 right-0 px-4 py-1 rounded-bl-2xl text-xs font-bold text-white ${statusRibbonColors[status] || 'bg-gray-400'}`}>{grievance.status?.replace('_', ' ')}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {statusIcons[status] || <FileText className="h-4 w-4" />}
+                        <span className="font-semibold text-purple-700 text-base truncate">{grievance.title}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"><Layers className="h-3 w-3 mr-1" />{grievance.category}</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><Star className="h-3 w-3 mr-1" />{grievance.priority}</span>
+                      </div>
+                      <p className="text-sm text-zinc-500 mb-2 truncate">{grievance.description}</p>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-zinc-400">Submitted on {new Date(grievance.createdAt).toLocaleDateString()}</span>
+                      <button
+                        onClick={() => navigate(`/grievance/${grievance._id}`)}
+                        className="text-xs font-medium text-purple-600 hover:text-purple-500 transition"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
       {/* Floating Action Button for New Grievance */}

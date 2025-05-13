@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Clock, FileText, CheckCircle, XCircle, Building2 } from 'lucide-react';
 
+const statusOptions = [
+  { value: 'Pending', label: 'Pending' },
+  { value: 'In Progress', label: 'In Progress' },
+  { value: 'Resolved', label: 'Resolved' },
+  { value: 'Rejected', label: 'Rejected' },
+];
+
 const DepartmentDashboard = () => {
   const [grievances, setGrievances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [department, setDepartment] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
     const deptData = localStorage.getItem('department');
@@ -31,6 +40,33 @@ const DepartmentDashboard = () => {
       setError('An error occurred while fetching grievances');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (grievanceId, newStatus) => {
+    setUpdatingId(grievanceId);
+    setSuccessMsg('');
+    try {
+      const token = localStorage.getItem('departmentToken');
+      const response = await fetch(`http://localhost:8080/api/grievances/${grievanceId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (response.ok) {
+        setSuccessMsg('Status updated successfully!');
+        fetchGrievances();
+      } else {
+        setError('Failed to update status');
+      }
+    } catch (err) {
+      setError('An error occurred while updating status');
+    } finally {
+      setUpdatingId(null);
+      setTimeout(() => setSuccessMsg(''), 2000);
     }
   };
 
@@ -75,6 +111,11 @@ const DepartmentDashboard = () => {
             {department ? `${department.name} Department` : 'Department Dashboard'}
           </h1>
         </div>
+        {successMsg && (
+          <div className="mb-4 flex items-center bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span>{successMsg}</span>
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
@@ -104,11 +145,21 @@ const DepartmentDashboard = () => {
                             {grievance.description}
                           </p>
                         </div>
-                        <div className="ml-4 flex-shrink-0">
+                        <div className="ml-4 flex-shrink-0 flex flex-col items-end gap-2">
                           <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium shadow ${getStatusColor(grievance.status)}`}>
                             {getStatusIcon(grievance.status)}
                             <span className="ml-1 capitalize">{grievance.status}</span>
                           </span>
+                          <select
+                            value={grievance.status}
+                            onChange={e => handleStatusChange(grievance._id, e.target.value)}
+                            disabled={updatingId === grievance._id}
+                            className="mt-1 rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-xs px-2 py-1"
+                          >
+                            {statusOptions.map(opt => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                       <div className="flex justify-between items-center text-xs text-zinc-400">

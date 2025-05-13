@@ -17,6 +17,15 @@ const HomePage = () => {
   const [minimized, setMinimized] = useState(false);
   const chatbotRef = useRef(null);
 
+  const handleRegisterGrievance = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/submit-grievance');
+    } else {
+      navigate('/login', { state: { from: '/submit-grievance' } });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50">
       {/* Hero Section - Redesigned with asymmetric layout */}
@@ -40,7 +49,7 @@ const HomePage = () => {
               <div className="flex flex-wrap gap-3">
                 <button
                   className="bg-white text-purple-900 px-5 py-3 rounded-full font-medium hover:bg-purple-50 transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
-                  onClick={() => navigate("/register-grievance")}
+                  onClick={handleRegisterGrievance}
                 >
                   <span>Register Grievance</span>
                   <ChevronRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
