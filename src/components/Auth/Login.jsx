@@ -55,8 +55,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 via-indigo-600 to-blue-400 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0" style={{ backgroundImage: 'url(\"https://uktech.ac.in/images/UTU-Dehradun-building.jpg\")', filter: 'brightness(0.85)' }} />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* Content */}
+      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-2xl relative z-20">
         <div>
           <LockIcon />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const DashboardLayout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,11 +20,21 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
+      {/* Sidebar & overlay */}
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-label="Close sidebar overlay"
+        ></div>
+      )}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0 md:static md:block
+          transition-transform duration-300 ease-in-out`}
+        aria-label="Sidebar"
       >
         <div className="flex items-center justify-center h-16 border-b">
           <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
@@ -39,6 +49,7 @@ const DashboardLayout = ({ children }) => {
                   ? 'bg-gray-100 text-gray-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
+              onClick={() => setIsSidebarOpen(false)}
             >
               <span className="mr-3">{item.icon}</span>
               {item.name}
@@ -56,16 +67,19 @@ const DashboardLayout = ({ children }) => {
       </div>
 
       {/* Main content */}
-      <div className={`${isSidebarOpen ? 'ml-64' : 'ml-0'} transition-margin duration-300 ease-in-out`}>
+      <div className={`md:ml-64 ${isSidebarOpen ? 'overflow-hidden h-screen' : ''} transition-margin duration-300 ease-in-out`}>
         {/* Top bar */}
-        <div className="bg-white shadow-sm">
+        <div className="bg-white shadow-sm sticky top-0 z-30">
           <div className="flex items-center justify-between h-16 px-4">
+            {/* Hamburger only on mobile */}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-gray-500 hover:text-gray-600 focus:outline-none"
+              className="text-gray-500 hover:text-gray-600 focus:outline-none md:hidden"
+              aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
             >
+              <span className="sr-only">Toggle sidebar</span>
               <svg
-                className="h-6 w-6"
+                className="h-6 w-6 transition-transform duration-300"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -74,9 +88,18 @@ const DashboardLayout = ({ children }) => {
                 stroke="currentColor"
               >
                 {isSidebarOpen ? (
-                  <path d="M6 18L18 6M6 6l12 12" />
+                  // Animated X
+                  <>
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="6" y1="18" x2="18" y2="6" />
+                  </>
                 ) : (
-                  <path d="M4 6h16M4 12h16M4 18h16" />
+                  // Hamburger
+                  <>
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="20" y2="18" />
+                  </>
                 )}
               </svg>
             </button>
