@@ -97,8 +97,8 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        sessionStorage.setItem('token', data.token);
+        sessionStorage.setItem('user', JSON.stringify(data.user));
         navigate('/dashboard');
       } else {
         setError(data.message || 'Registration failed');

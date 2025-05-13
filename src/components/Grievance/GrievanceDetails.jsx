@@ -24,7 +24,7 @@ const GrievanceDetails = () => {
 
   const fetchGrievanceDetails = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         navigate("/login");
         return;
@@ -59,7 +59,7 @@ const GrievanceDetails = () => {
     if (!comment.trim()) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await fetch(
         `http://localhost:8080/api/grievances/${id}/comments`,
         {

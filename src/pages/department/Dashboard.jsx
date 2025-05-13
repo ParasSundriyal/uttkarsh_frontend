@@ -17,7 +17,7 @@ const DepartmentDashboard = () => {
   const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
-    const deptData = localStorage.getItem('department');
+    const deptData = sessionStorage.getItem('department');
     if (deptData) setDepartment(JSON.parse(deptData));
     fetchGrievances();
   }, []);
@@ -26,7 +26,7 @@ const DepartmentDashboard = () => {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('departmentToken');
+      const token = sessionStorage.getItem('departmentToken');
       const response = await fetch('http://localhost:8080/api/department/grievances', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
@@ -47,7 +47,7 @@ const DepartmentDashboard = () => {
     setUpdatingId(grievanceId);
     setSuccessMsg('');
     try {
-      const token = localStorage.getItem('departmentToken');
+      const token = sessionStorage.getItem('departmentToken');
       const response = await fetch(`http://localhost:8080/api/grievances/${grievanceId}`, {
         method: 'PUT',
         headers: {

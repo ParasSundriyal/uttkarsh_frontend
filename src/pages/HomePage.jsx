@@ -9,13 +9,29 @@ import {
   ChevronRight,
   Clock,
   Award,
+  TrendingUp,
 } from "lucide-react";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [showChatbot, setShowChatbot] = useState(false);
   const [minimized, setMinimized] = useState(false);
+  const [trendingKeywords, setTrendingKeywords] = useState([]);
   const chatbotRef = useRef(null);
+
+  useEffect(() => {
+    const fetchTrendingKeywords = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5002/trending-keywords');
+        const data = await response.json();
+        setTrendingKeywords(data.keywords);
+      } catch (error) {
+        console.error('Error fetching trending keywords:', error);
+      }
+    };
+
+    fetchTrendingKeywords();
+  }, []);
 
   const handleRegisterGrievance = () => {
     const token = localStorage.getItem('token');
@@ -273,6 +289,33 @@ const HomePage = () => {
               </div>
               <p className="opacity-80">Partner Institutions</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Trending Topics Section */}
+      <div className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium mb-4">
+              Current Trends
+            </span>
+            <h2 className="text-3xl font-bold text-zinc-900 mb-4">Hot Topics</h2>
+            <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+              See what issues are currently trending among students
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-3">
+            {trendingKeywords.map((keyword, index) => (
+              <div
+                key={index}
+                className="bg-purple-50 text-purple-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-purple-100 transition-all duration-300 transform hover:-translate-y-1 cursor-default"
+              >
+                <TrendingUp className="inline-block w-4 h-4 mr-2" />
+                {keyword}
+              </div>
+            ))}
           </div>
         </div>
       </div>

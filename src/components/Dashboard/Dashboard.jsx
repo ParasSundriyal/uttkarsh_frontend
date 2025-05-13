@@ -33,7 +33,7 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
+    const userData = sessionStorage.getItem('user');
     if (userData) setUser(JSON.parse(userData));
     fetchGrievances();
     if (location.state?.refresh) {
@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   const fetchGrievances = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         navigate('/login');
         return;
@@ -73,8 +73,8 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -185,6 +185,14 @@ const Dashboard = () => {
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700"><Star className="h-3 w-3 mr-1" />{grievance.priority}</span>
                       </div>
                       <p className="text-sm text-zinc-500 mb-2 truncate">{grievance.description}</p>
+                      {grievance.aiPrediction && (
+                        <div className="inline-block mt-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold border border-purple-100">
+                          Chance of Resolution: {grievance.aiPrediction}
+                          {grievance.aiProbability !== undefined && grievance.aiProbability !== null && (
+                            <span className="ml-2 text-purple-400">({(grievance.aiProbability * 100).toFixed(1)}%)</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-xs text-zinc-400">Submitted on {new Date(grievance.createdAt).toLocaleDateString()}</span>

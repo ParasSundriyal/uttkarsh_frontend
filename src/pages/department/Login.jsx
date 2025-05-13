@@ -27,8 +27,8 @@ const DepartmentLogin = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('departmentToken', data.token);
-        localStorage.setItem('department', JSON.stringify(data.department));
+        sessionStorage.setItem('departmentToken', data.token);
+        sessionStorage.setItem('department', JSON.stringify(data.department));
         navigate('/department/dashboard');
       } else {
         setError(data.message || 'Login failed');
